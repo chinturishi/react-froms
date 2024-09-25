@@ -9,8 +9,8 @@ const ExpenseForm = ({ setExpense }) => {
     amount: "",
   });
   const [errors, setErrors] = useState({});
-  const myref = useRef("hi");
-  console.log(myref);
+  //const myref = useRef("hi");
+  //console.log(myref);
   const options = [
     { value: "grocery", text: "Grocery" },
     { value: "clothes", text: "Clothes" },
@@ -49,7 +49,6 @@ const ExpenseForm = ({ setExpense }) => {
   };
 
   const validate = (formData) => {
-    console.log(formData)
     const errorData = {};
     Object.entries(formData).forEach(([key,value])=>{
       validationConfig[key].some((rule)=>{
@@ -61,7 +60,6 @@ const ExpenseForm = ({ setExpense }) => {
           errorData[key]=rule.message;
           return true;
         }
-        console.log(rule.numberOnly)
         if(rule.numberOnly && !rule.numberOnly.test(value)){
           errorData[key]=rule.message;
           return true;
