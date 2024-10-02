@@ -27,7 +27,6 @@ main {
     width: 100%;
     border-collapse: collapse;
     align-self: flex-start;
-    margin: 20px;
 }
 
 .expense-table select {

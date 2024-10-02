@@ -2,15 +2,14 @@ import React, { useRef, useState } from "react";
 import Input from "./Input";
 import Select from "./Select";
 
-const ExpenseForm = ({ setExpense }) => {
-  const [expenses, setExpenses] = useState({
-    title: "",
-    category: "",
-    amount: "",
-  });
+const ExpenseForm = ({
+  setExpense,
+  expenses,
+  setExpenses,
+  editRowId,
+  setEditRowId,
+}) => {
   const [errors, setErrors] = useState({});
-  //const myref = useRef("hi");
-  //console.log(myref);
   const options = [
     { value: "grocery", text: "Grocery" },
     { value: "clothes", text: "Clothes" },
@@ -18,7 +17,6 @@ const ExpenseForm = ({ setExpense }) => {
     { value: "education", text: "Education" },
     { value: "medicine", text: "Medicine" },
   ];
-
   const validationConfig = {
     title: [
       {
@@ -28,7 +26,7 @@ const ExpenseForm = ({ setExpense }) => {
       {
         minLength: 5,
         message: "Title should be atleast 5 characters",
-      }
+      },
     ],
     category: [
       {
@@ -44,38 +42,49 @@ const ExpenseForm = ({ setExpense }) => {
       {
         numberOnly: /^\d+$/,
         message: "Amount should be a number",
-      }
+      },
     ],
   };
 
   const validate = (formData) => {
     const errorData = {};
-    Object.entries(formData).forEach(([key,value])=>{
-      validationConfig[key].some((rule)=>{
-        if(rule.required && !value){
-          errorData[key]=rule.message;
+    Object.entries(formData).forEach(([key, value]) => {
+      validationConfig[key].some((rule) => {
+        if (rule.required && !value) {
+          errorData[key] = rule.message;
           return true;
         }
-        if(rule.minLength && value.length<rule.minLength){
-          errorData[key]=rule.message;
+        if (rule.minLength && value.length < rule.minLength) {
+          errorData[key] = rule.message;
           return true;
         }
-        if(rule.numberOnly && !rule.numberOnly.test(value)){
-          errorData[key]=rule.message;
+        if (rule.numberOnly && !rule.numberOnly.test(value)) {
+          errorData[key] = rule.message;
           return true;
         }
-      })
-    })
+      });
+    });
     setErrors(errorData);
     return errorData;
   };
 
-  
   const handleSubmit = (e) => {
-    console.log("inside handleSubmit");
     e.preventDefault();
     const validateResult = validate(expenses);
     if (Object.keys(validateResult).length) {
+      return;
+    }
+    if (editRowId) {
+      setExpense((prev)=>
+        prev.map((expenseItem)=>{
+          if(expenseItem.id===editRowId){
+          return {...expenses, id:editRowId};
+          }
+          return expenseItem;
+        })
+      )
+      setEditRowId("");
+      setExpenses({ title: "", category: "", amount: "" });
       return;
     }
     setExpense((prevState) => [
@@ -85,15 +94,15 @@ const ExpenseForm = ({ setExpense }) => {
     setExpenses({ title: "", category: "", amount: "" });
   };
 
-  const getFormData = (form) => {
-    const formdata = new FormData(form);
-    const data = {};
-    for (const [key, value] of formdata.entries()) {
-      data[key] = value;
-    }
-    console.log(data);
-    return data;
-  };
+  // const getFormData = (form) => {
+  //   const formdata = new FormData(form);
+  //   const data = {};
+  //   for (const [key, value] of formdata.entries()) {
+  //     data[key] = value;
+  //   }
+  //   console.log(data);
+  //   return data;
+  // };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -103,7 +112,6 @@ const ExpenseForm = ({ setExpense }) => {
     }));
     setErrors({});
   };
-
   return (
     <form className="expense-form" onSubmit={handleSubmit}>
       <Input
@@ -132,7 +140,7 @@ const ExpenseForm = ({ setExpense }) => {
         onChange={handleChange}
         error={errors.amount}
       ></Input>
-      <button className="add-btn">Add</button>
+      <button className="add-btn">{editRowId ? "Save" : "Add"}</button>
     </form>
   );
 };
